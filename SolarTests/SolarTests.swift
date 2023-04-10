@@ -11,7 +11,8 @@ import CoreLocation
 @testable import Solar
 
 final class SolarTests: XCTestCase {
-    
+    let timeZone = TimeZone(identifier: "UTC")!
+
     private let testDate = Date(timeIntervalSince1970: 1486598400)
     
     /// How accurate, in minutes either side of the actual sunrise sunset, we want to be
@@ -37,7 +38,7 @@ final class SolarTests: XCTestCase {
     
     func testSunrise() {
         for city in cities {
-            let solar = Solar(for: testDate, coordinate: city.coordinate)
+            let solar = Solar(for: testDate, coordinate: city.coordinate, timeZone: timeZone)
             
             guard
                 let sunrise = solar?.sunrise
@@ -51,7 +52,7 @@ final class SolarTests: XCTestCase {
     }
     
     func testSunrise_isNil_whenNoSunriseOccurs() {
-        let solar = Solar(for: testDate, coordinate: CLLocationCoordinate2D(latitude: 78.2186, longitude: 15.64007)) // Location: Longyearbyen
+        let solar = Solar(for: testDate, coordinate: CLLocationCoordinate2D(latitude: 78.2186, longitude: 15.64007), timeZone: timeZone) // Location: Longyearbyen
         XCTAssertNotNil(solar)
         XCTAssertNil(solar?.sunrise)
     }
@@ -59,7 +60,7 @@ final class SolarTests: XCTestCase {
     func testSunset() {
         for city in cities {
             
-            let solar = Solar(for: testDate, coordinate: city.coordinate)
+            let solar = Solar(for: testDate, coordinate: city.coordinate, timeZone: timeZone)
             
             guard
                 let sunset = solar?.sunset
@@ -74,7 +75,7 @@ final class SolarTests: XCTestCase {
     
     func testSunset_isNil_whenNoSunsetOccurs() {
         
-        let solar = Solar(for: testDate, coordinate: CLLocationCoordinate2D(latitude: 78.2186, longitude: 15.64007)) // Location: Longyearbyen
+        let solar = Solar(for: testDate, coordinate: CLLocationCoordinate2D(latitude: 78.2186, longitude: 15.64007), timeZone: timeZone) // Location: Longyearbyen
         XCTAssertNotNil(solar)
         XCTAssertNil(solar?.sunset)
     }
@@ -84,7 +85,7 @@ final class SolarTests: XCTestCase {
         let city = cities.first(where: { $0.name == "London" })!
         
         guard
-            let solar = Solar(for: daytime, coordinate: city.coordinate)
+            let solar = Solar(for: daytime, coordinate: city.coordinate, timeZone: timeZone)
         else {
             XCTFail("Cannot get solar")
             return
@@ -99,7 +100,7 @@ final class SolarTests: XCTestCase {
         let city = cities.first(where: { $0.name == "London" })!
         
         guard
-            let solar = Solar(for: sunrise, coordinate: city.coordinate)
+            let solar = Solar(for: sunrise, coordinate: city.coordinate, timeZone: timeZone)
         else {
             XCTFail("Cannot get solar")
             return
@@ -114,7 +115,7 @@ final class SolarTests: XCTestCase {
         let city = cities.first(where: { $0.name == "London" })!
         
         guard
-            let solar = Solar(for: sunset, coordinate: city.coordinate)
+            let solar = Solar(for: sunset, coordinate: city.coordinate, timeZone: timeZone)
         else {
             XCTFail("Cannot get solar")
             return
@@ -129,7 +130,7 @@ final class SolarTests: XCTestCase {
         let city = cities.first(where: { $0.name == "London" })!
         
         guard
-            let solar = Solar(for: beforeSunrise, coordinate: city.coordinate)
+            let solar = Solar(for: beforeSunrise, coordinate: city.coordinate, timeZone: timeZone)
         else {
             XCTFail("Cannot get solar")
             return
@@ -144,7 +145,7 @@ final class SolarTests: XCTestCase {
         let city = cities.first(where: { $0.name == "London" })!
         
         guard
-            let solar = Solar(for: afterSunset, coordinate: city.coordinate)
+            let solar = Solar(for: afterSunset, coordinate: city.coordinate, timeZone: timeZone)
         else {
             XCTFail("Cannot get solar")
             return
@@ -158,12 +159,12 @@ final class SolarTests: XCTestCase {
         
         let invalidCoordinate1 = CLLocationCoordinate2D(latitude: -100, longitude: 0)
         XCTAssertFalse(CLLocationCoordinate2DIsValid(invalidCoordinate1))
-        let solar1 = Solar(for: testDate, coordinate: invalidCoordinate1)
+        let solar1 = Solar(for: testDate, coordinate: invalidCoordinate1, timeZone: timeZone)
         XCTAssertNil(solar1)
         
         let invalidCoordinate2 = CLLocationCoordinate2D(latitude: 180, longitude: 190)
         XCTAssertFalse(CLLocationCoordinate2DIsValid(invalidCoordinate2))
-        let solar2 = Solar(for: testDate, coordinate: invalidCoordinate2)
+        let solar2 = Solar(for: testDate, coordinate: invalidCoordinate2, timeZone: timeZone)
         XCTAssertNil(solar2)
     }
 }

@@ -46,7 +46,7 @@ public struct Solar {
     
     // MARK: Init
     
-    public init?(for date: Date = Date(), coordinate: CLLocationCoordinate2D) {
+    public init?(for date: Date = Date(), coordinate: CLLocationCoordinate2D, timeZone: TimeZone) {
         self.date = date
         
         guard CLLocationCoordinate2DIsValid(coordinate) else {
@@ -56,22 +56,22 @@ public struct Solar {
         self.coordinate = coordinate
         
         // Fill this Solar object with relevant data
-        calculate()
+        calculate(timeZone: timeZone)
     }
     
     // MARK: - Public functions
     
     /// Sets all of the Solar object's sunrise / sunset variables, if possible.
     /// - Note: Can return `nil` objects if sunrise / sunset does not occur on that day.
-    public mutating func calculate() {
-        sunrise = calculate(.sunrise, for: date, and: .official)
-        sunset = calculate(.sunset, for: date, and: .official)
-        civilSunrise = calculate(.sunrise, for: date, and: .civil)
-        civilSunset = calculate(.sunset, for: date, and: .civil)
-        nauticalSunrise = calculate(.sunrise, for: date, and: .nautical)
-        nauticalSunset = calculate(.sunset, for: date, and: .nautical)
-        astronomicalSunrise = calculate(.sunrise, for: date, and: .astronimical)
-        astronomicalSunset = calculate(.sunset, for: date, and: .astronimical)
+    public mutating func calculate(timeZone: TimeZone) {
+        sunrise = calculate(.sunrise, for: date, and: .official, timeZone: timeZone)
+        sunset = calculate(.sunset, for: date, and: .official, timeZone: timeZone)
+        civilSunrise = calculate(.sunrise, for: date, and: .civil, timeZone: timeZone)
+        civilSunset = calculate(.sunset, for: date, and: .civil, timeZone: timeZone)
+        nauticalSunrise = calculate(.sunrise, for: date, and: .nautical, timeZone: timeZone)
+        nauticalSunset = calculate(.sunset, for: date, and: .nautical, timeZone: timeZone)
+        astronomicalSunrise = calculate(.sunrise, for: date, and: .astronimical, timeZone: timeZone)
+        astronomicalSunset = calculate(.sunset, for: date, and: .astronimical, timeZone: timeZone)
     }
     
     // MARK: - Private functions
@@ -89,12 +89,10 @@ public struct Solar {
         case astronimical = 108
     }
     
-    fileprivate func calculate(_ sunriseSunset: SunriseSunset, for date: Date, and zenith: Zenith) -> Date? {
-        guard let utcTimezone = TimeZone(identifier: "UTC") else { return nil }
-        
+    fileprivate func calculate(_ sunriseSunset: SunriseSunset, for date: Date, and zenith: Zenith, timeZone: TimeZone) -> Date? {
         // Get the day of the year
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = utcTimezone
+        calendar.timeZone = timeZone
         guard let dayInt = calendar.ordinality(of: .day, in: .year, for: date) else { return nil }
         let day = Double(dayInt)
         
@@ -181,7 +179,6 @@ public struct Solar {
         components.minute = Int(minute)
         components.second = Int(second)
         
-        calendar.timeZone = utcTimezone
         return calendar.date(from: components)
     }
     
